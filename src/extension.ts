@@ -5,7 +5,12 @@ export function activate(context: vscode.ExtensionContext) {
     "designPatternGenerator.generate",
     async () => {
       const pattern = await vscode.window.showQuickPick(
-        ["Singleton", "Factory", "Strategy"],
+        [
+          "Singleton: Clase con una única instancia global.",
+          "Factory: Crea objetos sin especificar la clase.",
+          "Strategy: Define una familia de algoritmos intercambiables.",
+          "Observer: Notifica cambios a múltiples objetos suscritos.",
+        ],
         {
           placeHolder: "Select a design pattern to generate",
         }
@@ -22,6 +27,9 @@ export function activate(context: vscode.ExtensionContext) {
             break;
           case "Strategy: Define una familia de algoritmos intercambiables.":
             code = generateStrategy();
+            break;
+          case "Observer: Notifica cambios a múltiples objetos suscritos.":
+            code = generateObserver();
             break;
         }
 
@@ -170,6 +178,78 @@ console.log(context.executeStrategy(5, 3)); // Salida: 2
 
 context.setStrategy(new MultiplicationStrategy()); // Cambia a estrategia de multiplicación
 console.log(context.executeStrategy(5, 3)); // Salida: 15`;
+}
+
+export function generateObserver(): string {
+  return `// Interfaz para el Observador
+interface Observer {
+    update(message: string): void; // Método para recibir actualizaciones
+}
+
+// Clase Observada (Subject)
+class Subject {
+    private observers: Observer[] = []; // Lista de observadores
+
+    // Agrega un observador a la lista
+    public attach(observer: Observer): void {
+        this.observers.push(observer);
+        console.log("Observer attached.");
+    }
+
+    // Remueve un observador de la lista
+    public detach(observer: Observer): void {
+        const observerIndex = this.observers.indexOf(observer);
+        if (observerIndex !== -1) {
+            this.observers.splice(observerIndex, 1);
+            console.log("Observer detached.");
+        }
+    }
+
+    // Notifica a todos los observadores de un cambio
+    public notify(message: string): void {
+        console.log("Notifying observers...");
+        for (const observer of this.observers) {
+            observer.update(message);
+        }
+    }
+
+    // Simula un cambio de estado
+    public someBusinessLogic(): void {
+        console.log("Subject: Doing some important work...");
+        const message = "State changed!";
+        this.notify(message); // Notifica a los observadores
+    }
+}
+
+// Observador concreto que implementa la interfaz Observer
+class ConcreteObserverA implements Observer {
+    update(message: string): void {
+        console.log("ConcreteObserverA: Received update with message: " + message);
+    }
+}
+
+// Otro observador concreto
+class ConcreteObserverB implements Observer {
+    update(message: string): void {
+        console.log("ConcreteObserverB: Received update with message: " + message);
+    }
+}
+
+// Uso del patrón Observer
+const subject = new Subject();
+
+const observerA = new ConcreteObserverA();
+const observerB = new ConcreteObserverB();
+
+subject.attach(observerA); // Agrega el primer observador
+subject.attach(observerB); // Agrega el segundo observador
+
+subject.someBusinessLogic(); // Cambia el estado y notifica a los observadores
+
+subject.detach(observerA); // Remueve un observador
+
+subject.someBusinessLogic(); // Cambia el estado y notifica a los observadores restantes
+`;
 }
 
 export function deactivate() {}
