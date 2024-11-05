@@ -2,7 +2,12 @@
   "name": "generate-design-pattern",
   "displayName": "Generate Design Pattern",
   "description": "Generates common design patterns (Singleton, Factory, Observer) in code, helping developers quickly apply software architecture best practices in their projects",
-  "version": "0.0.1",
+  "version": "1.0",
+  "icon": "src/images/logo.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/RodriDS12/DesignPatternsExtension.git"
+  },
   "engines": {
     "vscode": "^1.95.0"
   },
