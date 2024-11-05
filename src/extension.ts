@@ -1,4 +1,13 @@
 import * as vscode from "vscode";
+import {
+  generateSingletonCsharp,
+  generateSingletonJavaScript,
+  generateSingletonPython,
+  generateSingletonTypeScript,
+} from "./Patterns/Singleton";
+import { generateFactoryCsharp, generateFactoryJavaScript, generateFactoryPhyton, generateFactoryTypeScript } from "./Patterns/Factory";
+import { generateStrategyCsharp, generateStrategyJavaScript, generateStrategyPhyton, generateStrategyTypeScript } from "./Patterns/Strategy";
+import { generateObserverCsharp, generateObserverJavaScript, generateObserverPhyton, generateObserverTypeScript } from "./Patterns/Observer";
 
 export function activate(context: vscode.ExtensionContext) {
   const disposable = vscode.commands.registerCommand(
@@ -6,10 +15,22 @@ export function activate(context: vscode.ExtensionContext) {
     async () => {
       const pattern = await vscode.window.showQuickPick(
         [
-          "Singleton: Clase con una única instancia global.",
-          "Factory: Crea objetos sin especificar la clase.",
-          "Strategy: Define una familia de algoritmos intercambiables.",
-          "Observer: Notifica cambios a múltiples objetos suscritos.",
+          {
+            label: "Singleton",
+            description: "Clase con una única instancia global",
+          },
+          {
+            label: "Factory",
+            description: "Crea objetos sin especificar la clase",
+          },
+          {
+            label: "Strategy",
+            description: "Define una familia de algoritmos intercambiables",
+          },
+          {
+            label: "Observer",
+            description: "Notifica cambios a múltiples objetos suscritos",
+          },
         ],
         {
           placeHolder: "Select a design pattern to generate",
@@ -17,28 +38,25 @@ export function activate(context: vscode.ExtensionContext) {
       );
 
       if (pattern) {
+        const language = await getLanguage();
+
         let code = "";
-        switch (pattern) {
-          case "Singleton: Clase con una única instancia global.":
-            code = generateSingleton();
+        switch (pattern.label) {
+          case "Singleton":
+            code = generateSingletonByLanguage(language as string);
             break;
-          case "Factory: Crea objetos sin especificar la clase.":
-            code = generateFactory();
+          case "Factory":
+            code = generateFactoryByLanguage(language as string);
             break;
-          case "Strategy: Define una familia de algoritmos intercambiables.":
-            code = generateStrategy();
+          case "Strategy":
+            code = generateStrategyByLanguage(language as string);
             break;
-          case "Observer: Notifica cambios a múltiples objetos suscritos.":
-            code = generateObserver();
+          case "Observer":
+            code = generateObserverByLanguage(language as string);
             break;
         }
 
-        const editor = vscode.window.activeTextEditor;
-        if (editor) {
-          editor.edit((editBuilder) => {
-            editBuilder.insert(editor.selection.active, code);
-          });
-        }
+        insertCodeToEditor(code);
       }
     }
   );
@@ -46,210 +64,84 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(disposable);
 }
 
-export function generateSingleton(): string {
-  return `// Clase Singleton
-class Singleton {
-  private static instance: Singleton; // Almacena la única instancia de la clase
-  private constructor() {
-    // Constructor privado para evitar la creación de instancias desde fuera
-    console.log('Instancia creada');
-  }
-
-  // Método estático para obtener la instancia del Singleton
-  public static getInstance(): Singleton {
-    if (!Singleton.instance) {
-      Singleton.instance = new Singleton(); // Crea la instancia si no existe
-    }
-    return Singleton.instance; // Retorna la única instancia
-  }
-
-  public someBusinessLogic(): void {
-    console.log('Ejecutando lógica de negocio');
+function generateSingletonByLanguage(language: string): string {
+  switch (language) {
+    case "Typescript":
+      return generateSingletonTypeScript();
+    case "Javascript":
+      return generateSingletonJavaScript();
+    case "Python":
+      return generateSingletonPython();
+    case "Csharp":
+      return generateSingletonCsharp();
+    default:
+      return generateSingletonTypeScript();
   }
 }
 
-// Uso del Singleton
-const instance1 = Singleton.getInstance(); // Obtiene la instancia
-instance1.someBusinessLogic(); // Salida: Ejecutando lógica de negocio
-
-const instance2 = Singleton.getInstance(); // Vuelve a obtener la misma instancia
-console.log(instance1 === instance2); // Salida: true
-    `;
-}
-
-export function generateFactory(): string {
-  return `// Interfaz para los productos
-interface Product {
-    name: string; // Propiedad para almacenar el nombre del producto
-    use(): void;  // Método para definir cómo se usa el producto
-}
-
-// Implementación de un producto concreto A
-class ConcreteProductA implements Product {
-    name = "Producto A"; // Nombre específico para el Producto A
-
-    use(): void {
-        console.log("Usando el " + this.name); // Salida cuando se usa el Producto A
-    }
-}
-
-// Implementación de un producto concreto B
-class ConcreteProductB implements Product {
-    name = "Producto B"; // Nombre específico para el Producto B
-
-    use(): void {
-        console.log("Usando el " + this.name); // Salida cuando se usa el Producto B
-    }
-}
-
-// Clase Factory que crea productos
-class ProductFactory {
-    // Método estático para crear un producto según el tipo proporcionado
-    static createProduct(type: string): Product {
-        switch (type) {
-            case "A":
-                return new ConcreteProductA(); // Retorna una instancia del Producto A
-            case "B":
-                return new ConcreteProductB(); // Retorna una instancia del Producto B
-            default:
-                throw new Error("Tipo de producto no válido."); // Maneja tipos de producto no válidos
-        }
-    }
-}
-
-// Uso del Factory
-const productA = ProductFactory.createProduct("A"); // Crea el Producto A
-productA.use();  // Salida: Usando el Producto A
-
-const productB = ProductFactory.createProduct("B"); // Crea el Producto B
-productB.use();  // Salida: Usando el Producto B`;
-}
-
-export function generateStrategy(): string {
-  return `// Interfaz para las estrategias
-interface Strategy {
-  execute(a: number, b: number): number; // Método que define la operación
-}
-
-// Estrategia concreta para sumar
-class AdditionStrategy implements Strategy {
-  execute(a: number, b: number): number {
-      return a + b; // Realiza la suma
+function generateFactoryByLanguage(language: string): string {
+  switch (language) {
+    case "Typescript":
+      return generateFactoryTypeScript();
+    case "Javascript":
+      return generateFactoryJavaScript();
+    case "Python":
+      return generateFactoryPhyton();
+    case "Csharp":
+      return generateFactoryCsharp();
+    default:
+      return generateFactoryTypeScript();
   }
 }
 
-// Estrategia concreta para restar
-class SubtractionStrategy implements Strategy {
-  execute(a: number, b: number): number {
-      return a - b; // Realiza la resta
+function generateStrategyByLanguage(language: string): string {
+  switch (language) {
+    case "Typescript":
+      return generateStrategyTypeScript();
+    case "Javascript":
+      return generateStrategyJavaScript();
+    case "Python":
+      return generateStrategyPhyton();
+    case "Csharp":
+      return generateStrategyCsharp();
+    default:
+      return generateStrategyTypeScript();
   }
 }
 
-// Estrategia concreta para multiplicar
-class MultiplicationStrategy implements Strategy {
-  execute(a: number, b: number): number {
-      return a * b; // Realiza la multiplicación
+function generateObserverByLanguage(language: string): string {
+  switch (language) {
+    case "Typescript":
+      return generateObserverTypeScript();
+    case "Javascript":
+      return generateObserverJavaScript();
+    case "Python":
+      return generateObserverPhyton();
+    case "Csharp":
+      return generateObserverCsharp();
+    default:
+      return generateObserverTypeScript();
   }
 }
 
-// Contexto que utiliza la estrategia
-class Context {
-  private strategy: Strategy; // Almacena la estrategia actual
-
-  constructor(strategy: Strategy) {
-      this.strategy = strategy; // Asigna la estrategia
-  }
-
-  setStrategy(strategy: Strategy) {
-      this.strategy = strategy; // Permite cambiar la estrategia
-  }
-
-  executeStrategy(a: number, b: number): number {
-      return this.strategy.execute(a, b); // Ejecuta la estrategia
+function insertCodeToEditor(code: string) {
+  const editor = vscode.window.activeTextEditor;
+  if (editor) {
+    editor.edit((editBuilder) => {
+      editBuilder.insert(editor.selection.active, code);
+    });
   }
 }
 
-// Uso del patrón Strategy
-const context = new Context(new AdditionStrategy()); // Contexto con estrategia de suma
-console.log(context.executeStrategy(5, 3)); // Salida: 8
+async function getLanguage(): Promise<string> {
+  let language = vscode.workspace.getConfiguration("patternGen").get("language") as string | undefined;
 
-context.setStrategy(new SubtractionStrategy()); // Cambia a estrategia de resta
-console.log(context.executeStrategy(5, 3)); // Salida: 2
-
-context.setStrategy(new MultiplicationStrategy()); // Cambia a estrategia de multiplicación
-console.log(context.executeStrategy(5, 3)); // Salida: 15`;
-}
-
-export function generateObserver(): string {
-  return `// Interfaz para el Observador
-interface Observer {
-    update(message: string): void; // Método para recibir actualizaciones
-}
-
-// Clase Observada (Subject)
-class Subject {
-    private observers: Observer[] = []; // Lista de observadores
-
-    // Agrega un observador a la lista
-    public attach(observer: Observer): void {
-        this.observers.push(observer);
-        console.log("Observer attached.");
-    }
-
-    // Remueve un observador de la lista
-    public detach(observer: Observer): void {
-        const observerIndex = this.observers.indexOf(observer);
-        if (observerIndex !== -1) {
-            this.observers.splice(observerIndex, 1);
-            console.log("Observer detached.");
-        }
-    }
-
-    // Notifica a todos los observadores de un cambio
-    public notify(message: string): void {
-        console.log("Notifying observers...");
-        for (const observer of this.observers) {
-            observer.update(message);
-        }
-    }
-
-    // Simula un cambio de estado
-    public someBusinessLogic(): void {
-        console.log("Subject: Doing some important work...");
-        const message = "State changed!";
-        this.notify(message); // Notifica a los observadores
-    }
-}
-
-// Observador concreto que implementa la interfaz Observer
-class ConcreteObserverA implements Observer {
-    update(message: string): void {
-        console.log("ConcreteObserverA: Received update with message: " + message);
-    }
-}
-
-// Otro observador concreto
-class ConcreteObserverB implements Observer {
-    update(message: string): void {
-        console.log("ConcreteObserverB: Received update with message: " + message);
-    }
-}
-
-// Uso del patrón Observer
-const subject = new Subject();
-
-const observerA = new ConcreteObserverA();
-const observerB = new ConcreteObserverB();
-
-subject.attach(observerA); // Agrega el primer observador
-subject.attach(observerB); // Agrega el segundo observador
-
-subject.someBusinessLogic(); // Cambia el estado y notifica a los observadores
-
-subject.detach(observerA); // Remueve un observador
-
-subject.someBusinessLogic(); // Cambia el estado y notifica a los observadores restantes
-`;
+  if (!language) {
+    language = await vscode.window.showQuickPick(["Typescript", "Javascript", "Python", "Csharp"], {
+      placeHolder: "Select a language for the code pattern"
+    });
+  }
+  return language ?? "Typescript";
 }
 
 export function deactivate() {}

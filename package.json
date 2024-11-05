@@ -2,7 +2,7 @@
   "name": "pattern-gen",
   "displayName": "PatternGen",
   "description": "Generates common design patterns (Singleton, Factory, Observer) in code, helping developers quickly apply software architecture best practices in their projects",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "RodrigoDS12",
   "repository": {
     "type": "git",
@@ -18,6 +18,16 @@
   "activationEvents": [],
   "main": "./dist/extension.js",
   "contributes": {
+    "configuration": {
+    "properties": {
+      "designPatternGenerator.language": {
+        "type": "string",
+        "enum": ["Typescript", "Javascript", "Csharp", "Phyton"],
+        "default": "Typescript",
+        "description": "Select the language for generated patterns"
+      }
+    }
+  },
     "commands": [
       {
         "command": "designPatternGenerator.generate",
