@@ -13,6 +13,8 @@
   - **Observer**
   - **Strategy**
 - Interfaz fácil de usar a través de comandos y menús contextuales.
+- Personalización del código generado para adaptarse a diferentes lenguajes y estilos de código.
+- Documentación en línea para cada patrón con ejemplos de uso.
 
 ## Instalación
 
